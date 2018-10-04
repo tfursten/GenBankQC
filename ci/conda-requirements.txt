@@ -2,6 +2,6 @@ click==7.0
 ete3
 numpy
 pandas
-scikit-bio
+scikit-bio==0.5.4
 biopython
 pytest==3.8.2
