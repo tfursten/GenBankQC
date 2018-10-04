@@ -1,4 +1,3 @@
 retrying
 logbook
-bumpversion
-pathos
+bumpversion==0.5.3
