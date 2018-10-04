@@ -1,6 +1,6 @@
 pudb
 flake8
-sphinx
+sphinx==1.8.1
 pytest
 pytest-cov==2.6.0
 ipython==7.0.1
