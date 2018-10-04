@@ -1,3 +1,4 @@
 retrying
 logbook
 bumpversion==0.5.3
+pathos==0.2.2.1
