@@ -1,0 +1,58 @@
+{% set name = "GenBankQC" %}
+{% set version = "0.2a0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+
+package:
+  name: "{{ name|lower }}"
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: f1aad07badc81af3a0b65c14d892fa8716ee8696263e6f99a5f795dd46038180
+  patches: updatetocurrent.patch
+
+build:
+  number: 0
+  entry_points:
+    - genbankqc=genbankqc.__main__:cli
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  host:
+    - pip
+    - python {{ python }}
+  run:
+    - logbook
+    - biopython
+    - click
+    - qt
+    - pathos # -c conda-forge
+    - ete3
+    - mash #-c bioconda
+    - retrying # -c tara_furstenau
+    - pandas
+    - pytest
+    - python {{ python }}
+
+test:
+  imports:
+    - genbankqc
+  commands:
+    - genbankqc --help
+
+about:
+  home: https://github.com/andrewsanchez/GenBankQC
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: Quality control of genbank sequences
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - tfursten
