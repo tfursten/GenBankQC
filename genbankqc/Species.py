@@ -19,7 +19,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
 class Species:
     def __init__(self, path, max_unknowns=200, contigs=3.0, assembly_size=3.0,
-                 mash=3.0, assembly_summary=None):
+                 mash=3.0, assembly_summary=None, processes=1):
         """Represents a collection of genomes in `path`
 
         :param path: Path to the directory of related genomes you wish to analyze.
@@ -35,6 +35,7 @@ class Species:
         self.mash = mash
         self.assembly_summary = assembly_summary
         self.deviation_values = [max_unknowns, contigs, assembly_size, mash]
+        self.ncpus = processes
         self.path = os.path.abspath(path)
         self.name = os.path.basename(os.path.normpath(path))
         self.log = logbook.Logger(self.name)
@@ -180,10 +181,8 @@ class Species:
             self.paste_file = None
 
     def mash_dist(self):
-        from multiprocessing import cpu_count
-        ncpus = cpu_count() - 2
         cmd = "mash dist -p {} -t '{}' '{}' > '{}'".format(
-            ncpus, self.paste_file, self.paste_file, self.dmx_path)
+            self.ncpus, self.paste_file, self.paste_file, self.dmx_path)
         Popen(cmd, shell="True", stderr=DEVNULL).wait()
         self.log.info("MASH distance completed")
         self.dmx = pd.read_csv(self.dmx_path, index_col=0, sep="\t")
@@ -196,7 +195,7 @@ class Species:
 
     def sketch_genomes(self):
         """Sketch all genomes"""
-        with Pool() as pool:
+        with Pool(ncpus=self.ncpus) as pool:
             self.log.info("{} cpus in pool".format(pool.ncpus))
             pool.map(Genome.sketch_genome, self.genome_paths)
         self.log.info("All genomes sketched")
@@ -226,7 +225,7 @@ class Species:
     def get_stats(self):
         """Get stats for all genomes. Concat the results into a DataFrame"""
         dmx_mean = [self.dmx.mean()] * len(self.genome_paths)
-        with Pool() as pool:
+        with Pool(ncpus=self.ncpus) as pool:
             results = pool.map(Genome.mp_stats, self.genome_paths, dmx_mean)
         self.stats = pd.concat(results)
         self.stats.to_csv(self.stats_path)

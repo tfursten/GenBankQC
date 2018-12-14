@@ -64,14 +64,17 @@ def cli(ctx, path):
               help='Acceptable deviations for all metrics')
 @click.option('--metadata', is_flag=True,
               help='Get metadata for genome at PATH',)
+@click.option('--processes', type=int, default=1,
+              help="Number of processes")
 def species(ctx, path, unknowns, contigs, assembly_size, distance, all,
-            metadata):
+            metadata, processes):
     """Run commands on a single species"""
     kwargs = {"max_unknowns": unknowns,
               "contigs": contigs,
               "assembly_size": assembly_size,
               "mash": distance,
-              "assembly_summary": ctx.assembly_summary}
+              "assembly_summary": ctx.assembly_summary,
+              "processes": processes}
     logbook.set_datetime_format("local")
     log_dir = os.path.join(path, ".logs")
     log_file = os.path.join(log_dir, "qc.log")
